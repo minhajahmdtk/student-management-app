@@ -10,7 +10,6 @@ function verifyToken(req, res, next) {
 
   try {
     if (!token) {
-       console.log("❌ No token received");
       return res.status(401).json({
         message: "Unauthorized request"
       });
@@ -20,15 +19,12 @@ function verifyToken(req, res, next) {
       token,
       process.env.JWT_SECRET
     );
-    console.log("✅ Token verified");
-    console.log("Payload:", payload);
+    
     req.user = payload;
 
     next();
 
   } catch (error) {
-    console.log("❌ Token verification failed");
-    console.log("Error:", error.message);
     return res.status(401).json({
       message: "Invalid or expired token"
     });
@@ -37,7 +33,7 @@ function verifyToken(req, res, next) {
 
 
 // Add Student
-router.post("/add", async (req, res) => {
+router.post("/add",verifyToken, async (req, res) => {
 
   try {
 
