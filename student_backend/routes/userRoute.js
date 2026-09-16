@@ -1,14 +1,46 @@
 const express = require("express");
 const router = express.Router();
 const userModels = require("../models/userModel");
-const jwt= require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
-// Add Student
+// Verify Token
+function verifyToken(req, res, next) {
+  const token = req.headers.token;
 
+  try {
+    if (!token) {
+       console.log("❌ No token received");
+      return res.status(401).json({
+        message: "Unauthorized request"
+      });
+    }
+
+    const payload = jwt.verify(
+      token,
+      process.env.JWT_SECRET
+    );
+    console.log("✅ Token verified");
+    console.log("Payload:", payload);
+    req.user = payload;
+
+    next();
+
+  } catch (error) {
+    console.log("❌ Token verification failed");
+    console.log("Error:", error.message);
+    return res.status(401).json({
+      message: "Invalid or expired token"
+    });
+  }
+}
+
+
+// Add Student
 router.post("/add", async (req, res) => {
 
   try {
+
     const {
       regNo,
       candidateName,
@@ -18,7 +50,6 @@ router.post("/add", async (req, res) => {
       password
     } = req.body;
 
-
     const regExist = await userModels.findOne({ regNo });
 
     if (regExist) {
@@ -27,20 +58,17 @@ router.post("/add", async (req, res) => {
       });
     }
 
-
     if (!candidateName || candidateName.trim() === "") {
       return res.status(400).json({
         message: "Candidate name required"
       });
     }
 
-
     if (!course || course.trim() === "") {
       return res.status(400).json({
         message: "Course required"
       });
     }
-
 
     const emailExist = await userModels.findOne({ email });
 
@@ -50,13 +78,11 @@ router.post("/add", async (req, res) => {
       });
     }
 
-
     if (marks === undefined || marks === null) {
       return res.status(400).json({
         message: "Marks required"
       });
     }
-
 
     if (!password || password.length < 5) {
       return res.status(400).json({
@@ -64,76 +90,95 @@ router.post("/add", async (req, res) => {
       });
     }
 
-const hashedPassword =await bcrypt.hash(password,10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newStudent = new userModels({
-
       regNo,
       candidateName,
       course,
       email,
       marks,
-      password:hashedPassword
-
+      password: hashedPassword
     });
+
     await newStudent.save();
+
+    const studentResponse = newStudent.toObject();
+    delete studentResponse.password;
+
     res.status(201).json({
-      message:"Student added successfully",
-      student:newStudent
+      message: "Student added successfully",
+      student: studentResponse
     });
 
-  } catch(error) {
+  } catch (error) {
+
     res.status(500).json({
-      message:error.message
+      message: error.message
     });
+
   }
 });
 
 
-// Get All Students (OBJECT RESPONSE)
-
-router.get("/", async(req,res)=>{
+// Get All Students
+router.get("/", verifyToken, async (req, res) => {
 
   try {
-    const students = await userModels.find();
+
+    const students = await userModels.find().select("-password");
+
     res.status(200).json({
       students: students
     });
-  } catch(error) {
+
+  } catch (error) {
+
     res.status(500).json({
-     message:error.message
+      message: error.message
     });
+
   }
 });
-
-
 
 
 // Get Student By ID
-router.get("/:id", async(req,res)=>{
-  try{
-    const student =
-    await userModels.findById(req.params.id);
-    if(!student){
+router.get("/:id", verifyToken, async (req, res) => {
+
+  try {
+
+    const student = await userModels
+      .findById(req.params.id)
+      .select("-password");
+
+    if (!student) {
       return res.status(404).json({
-        message:"Student not found"
+        message: "Student not found"
       });
     }
+
     res.status(200).json({
-      student:student
+      student: student
     });
-  }catch(error){
+
+  } catch (error) {
+
     res.status(500).json({
-      message:error.message
+      message: error.message
     });
+
   }
 });
 
-// Update Student
 
-router.put("/:id", async (req, res) => {
+// Update Student
+router.put("/:id", verifyToken, async (req, res) => {
+
   try {
-    const updateData = { ...req.body };
+
+    const updateData = {
+      ...req.body
+    };
 
     if (updateData.password) {
       updateData.password = await bcrypt.hash(
@@ -147,7 +192,7 @@ router.put("/:id", async (req, res) => {
         req.params.id,
         updateData,
         { new: true }
-      );
+      ).select("-password");
 
     if (!updatedStudent) {
       return res.status(404).json({
@@ -155,79 +200,110 @@ router.put("/:id", async (req, res) => {
       });
     }
 
-    res.json({
+    res.status(200).json({
       message: "Student updated successfully",
       student: updatedStudent
     });
 
   } catch (error) {
+
     res.status(400).json({
       message: error.message
     });
+
   }
 });
 
-// Delete Student
 
-router.delete("/:id", async(req,res)=>{
-  try{
-    const deletedStudent = await userModels.findByIdAndDelete(req.params.id);
-    if(!deletedStudent){
+// Delete Student
+router.delete("/:id", verifyToken, async (req, res) => {
+
+  try {
+
+    const deletedStudent =
+      await userModels.findByIdAndDelete(req.params.id);
+
+    if (!deletedStudent) {
       return res.status(404).json({
-        message:"Student not found"
+        message: "Student not found"
       });
     }
-    res.json({
-      message:"Student deleted successfully"
+
+    res.status(200).json({
+      message: "Student deleted successfully"
     });
-  }catch(error){
+
+  } catch (error) {
+
     res.status(400).json({
-      message:error.message
+      message: error.message
     });
+
   }
 });
 
 
 // Login
+router.post("/login", async (req, res) => {
 
-router.post("/login", async(req,res)=>{
-  try{
+  try {
+
     const {
       email,
       password
     } = req.body;
+
     const student =
-    await userModels.findOne({email});
-    if(!student){
+      await userModels.findOne({ email });
+
+    if (!student) {
       return res.status(404).json({
-        message:"Email not found"
+        message: "Email not found"
       });
     }
-    const isPasswordValid= await bcrypt.compare(
-      password, student.password
-    );
-    if(!isPasswordValid){
+
+    const isPasswordValid =
+      await bcrypt.compare(
+        password,
+        student.password
+      );
+
+    if (!isPasswordValid) {
       return res.status(400).json({
-        message:"Invalid password"
+        message: "Invalid password"
       });
     }
-    const payload={email:student.email};
+
+    const payload = {
+      id: student._id,
+      email: student.email
+    };
+
     const token = jwt.sign(
-  payload,
-  process.env.JWT_SECRET
-);
+      payload,
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h"
+      }
+    );
+
+    const studentResponse = student.toObject();
+    delete studentResponse.password;
+
     res.status(200).json({
-      message:"Login successful",
-      token:token,
-      student:student
+      message: "Login successful",
+      token: token,
+      student: studentResponse
     });
-  }catch(error){
+
+  } catch (error) {
+
     res.status(500).json({
-      message:error.message
+      message: error.message
     });
+
   }
 });
-
 
 
 module.exports = router;
