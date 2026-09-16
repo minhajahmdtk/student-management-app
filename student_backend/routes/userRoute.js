@@ -33,7 +33,7 @@ function verifyToken(req, res, next) {
 
 
 // Add Student
-router.post("/add",verifyToken, async (req, res) => {
+router.post("/add",async (req, res) => {
 
   try {
 
