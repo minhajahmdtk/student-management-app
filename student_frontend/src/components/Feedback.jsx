@@ -3,18 +3,16 @@ import "../assets/style.css";
 import { useState } from "react";
 import axiosInstance from "../../axiosInterceptor";
 
-
-
 const Feedback = () => {
-  
   const [form, setForm] = useState({
     email: "",
     course: "",
-    feedback: ""
+    feedback: "",
   });
 
   function handleChange(e) {
     const { name, value } = e.target;
+
     setForm((prevForm) => ({
       ...prevForm,
       [name]: value,
@@ -23,18 +21,17 @@ const Feedback = () => {
 
   function handleSubmit(e) {
     e.preventDefault();
+
     axiosInstance
-      .post("http://localhost:3000/feedbacks/add", form)
+      .post("/feedbacks/add", form)
       .then((response) => {
         alert("Feedback submitted Successfully");
         console.log("Feedback Successful", response.data);
-        
       })
       .catch((error) => {
         console.error("Error:", error);
       });
   }
-
 
   return (
     <div className="container">
@@ -45,14 +42,15 @@ const Feedback = () => {
         <h2>Feedback</h2>
 
         {/* Email */}
-        <Form.Field className="FormField" name="email">
-
+        <Form.Field
+          className="FormField"
+          name="email"
+        >
           <Form.Label className="FormLabel">
             Email
           </Form.Label>
 
           <Form.Control asChild>
-
             <input
               className="Input"
               type="email"
@@ -66,14 +64,15 @@ const Feedback = () => {
         </Form.Field>
 
         {/* Course */}
-        <Form.Field className="FormField" name="course">
-
+        <Form.Field
+          className="FormField"
+          name="course"
+        >
           <Form.Label className="FormLabel">
             Course
           </Form.Label>
 
           <Form.Control asChild>
-
             <input
               className="Input"
               type="text"
@@ -87,10 +86,14 @@ const Feedback = () => {
         </Form.Field>
 
         {/* Feedback */}
-        <Form.Field className="FormField" name="feedback">
+        <Form.Field
+          className="FormField"
+          name="feedback"
+        >
           <Form.Label className="FormLabel">
             Feedback
           </Form.Label>
+
           <Form.Control asChild>
             <textarea
               className="Input"
@@ -103,12 +106,12 @@ const Feedback = () => {
               style={{
                 height: "120px",
                 paddingTop: "12px",
-                resize: "none"
+                resize: "none",
               }}
             />
-
           </Form.Control>
         </Form.Field>
+
         <Form.Submit asChild>
           <button className="Button">
             Submit Feedback

@@ -1,17 +1,17 @@
-import axios from "axios"
+import axios from "axios";
 
-const axiosInstance=axios.create({
-  baseURL:'http://localhost:3000'
-})
+const axiosInstance = axios.create({
+  baseURL: "/api"
+});
 
 axiosInstance.interceptors.request.use(
   function (config) {
-    const accessToken=localStorage.getItem('loginToken');
-    if(accessToken){
-      if(config){
-        config.headers.token=accessToken;
-      }
+    const accessToken = localStorage.getItem("loginToken");
+
+    if (accessToken) {
+      config.headers.token = accessToken;
     }
+
     return config;
   },
   function (error) {

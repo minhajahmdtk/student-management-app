@@ -4,23 +4,21 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../../axiosInterceptor";
 
-
 const Update = () => {
   const { id } = useParams();
-  const [form, setForm] = useState({
 
+  const [form, setForm] = useState({
     regNo: "",
     candidateName: "",
     course: "",
     email: "",
     marks: "",
-    password: ""
-
+    password: "",
   });
 
   useEffect(() => {
     axiosInstance
-      .get(`http://localhost:3000/students/${id}`)
+      .get(`/students/${id}`)
       .then((response) => {
         console.log(response.data);
         setForm(response.data.student);
@@ -29,23 +27,21 @@ const Update = () => {
         console.log(error);
       });
   }, [id]);
+
   function handleUpdate(e) {
     const { name, value } = e.target;
+
     setForm((prevForm) => ({
       ...prevForm,
-      [name]: value
-
+      [name]: value,
     }));
-
   }
 
   function handleSubmit(e) {
     e.preventDefault();
+
     axiosInstance
-      .put(
-        `http://localhost:3000/students/${id}`,
-        form
-      )
+      .put(`/students/${id}`, form)
       .then((response) => {
         alert("Student updated successfully");
         console.log(response.data);
@@ -53,17 +49,14 @@ const Update = () => {
       .catch((error) => {
         console.log(error);
       });
-
   }
 
   return (
-
     <div className="container">
       <Form.Root
         className="FormRoot"
         onSubmit={handleSubmit}
       >
-
         <Form.Field
           className="FormField"
           name="regNo"
@@ -71,6 +64,7 @@ const Update = () => {
           <Form.Label className="FormLabel">
             Register Number
           </Form.Label>
+
           <Form.Control asChild>
             <input
               className="Input"
@@ -82,6 +76,7 @@ const Update = () => {
             />
           </Form.Control>
         </Form.Field>
+
         <Form.Field
           className="FormField"
           name="candidateName"
@@ -89,6 +84,7 @@ const Update = () => {
           <Form.Label className="FormLabel">
             Candidate Name
           </Form.Label>
+
           <Form.Control asChild>
             <input
               className="Input"
@@ -100,6 +96,7 @@ const Update = () => {
             />
           </Form.Control>
         </Form.Field>
+
         <Form.Field
           className="FormField"
           name="course"
@@ -107,6 +104,7 @@ const Update = () => {
           <Form.Label className="FormLabel">
             Course
           </Form.Label>
+
           <Form.Control asChild>
             <input
               className="Input"
@@ -118,6 +116,7 @@ const Update = () => {
             />
           </Form.Control>
         </Form.Field>
+
         <Form.Field
           className="FormField"
           name="email"
@@ -125,6 +124,7 @@ const Update = () => {
           <Form.Label className="FormLabel">
             Email
           </Form.Label>
+
           <Form.Control asChild>
             <input
               className="Input"
@@ -136,6 +136,7 @@ const Update = () => {
             />
           </Form.Control>
         </Form.Field>
+
         <Form.Field
           className="FormField"
           name="marks"
@@ -143,6 +144,7 @@ const Update = () => {
           <Form.Label className="FormLabel">
             Marks
           </Form.Label>
+
           <Form.Control asChild>
             <input
               className="Input"
@@ -154,6 +156,7 @@ const Update = () => {
             />
           </Form.Control>
         </Form.Field>
+
         <Form.Submit asChild>
           <button className="Button">
             Update
@@ -163,6 +166,5 @@ const Update = () => {
     </div>
   );
 };
-
 
 export default Update;

@@ -5,7 +5,8 @@ import { useState } from "react";
 import axiosInstance from "../../axiosInterceptor";
 
 const Login = () => {
-  const navigate=useNavigate();
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -24,16 +25,19 @@ const Login = () => {
     e.preventDefault();
 
     axiosInstance
-      .post("http://localhost:3000/students/login",form)
+      .post("/students/login", form)
       .then((response) => {
-        if(response.data.token){
-          localStorage.setItem('loginToken',response.data.token);
-          
+        if (response.data.token) {
+          localStorage.setItem("loginToken", response.data.token);
         }
+
         localStorage.setItem("isLoggedIn", "true");
+
         alert("Login Successful");
+
         console.log(response.data);
-        navigate('/studentlist')
+
+        navigate("/studentlist");
       })
       .catch((error) => {
         alert("Invalid Email or Password");

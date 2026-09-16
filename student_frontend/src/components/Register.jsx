@@ -5,9 +5,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../axiosInterceptor";
 
-
 const Register = () => {
-  const navigate=useNavigate()
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     regNo: "",
     candidateName: "",
@@ -30,11 +30,11 @@ const Register = () => {
     e.preventDefault();
 
     axiosInstance
-      .post("http://localhost:3000/students/add", form)
+      .post("/students/add", form)
       .then((response) => {
         alert("Registration Successful");
         console.log("Registration Successful", response.data);
-        navigate('/login')
+        navigate("/login");
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -48,6 +48,7 @@ const Register = () => {
           <Form.Label className="FormLabel">
             Register Number
           </Form.Label>
+
           <Form.Control asChild>
             <input
               className="Input"
@@ -60,10 +61,12 @@ const Register = () => {
             />
           </Form.Control>
         </Form.Field>
+
         <Form.Field className="FormField" name="candidateName">
           <Form.Label className="FormLabel">
             Candidate Name
           </Form.Label>
+
           <Form.Control asChild>
             <input
               className="Input"
@@ -76,10 +79,12 @@ const Register = () => {
             />
           </Form.Control>
         </Form.Field>
+
         <Form.Field className="FormField" name="course">
           <Form.Label className="FormLabel">
             Course
           </Form.Label>
+
           <Form.Control asChild>
             <input
               className="Input"
@@ -92,6 +97,7 @@ const Register = () => {
             />
           </Form.Control>
         </Form.Field>
+
         <Form.Field className="FormField" name="email">
           <Form.Label className="FormLabel">
             Email
@@ -109,6 +115,7 @@ const Register = () => {
             />
           </Form.Control>
         </Form.Field>
+
         <Form.Field className="FormField" name="marks">
           <Form.Label className="FormLabel">
             Marks
@@ -126,6 +133,7 @@ const Register = () => {
             />
           </Form.Control>
         </Form.Field>
+
         <Form.Field className="FormField" name="password">
           <Form.Label className="FormLabel">
             Password
@@ -143,6 +151,7 @@ const Register = () => {
             />
           </Form.Control>
         </Form.Field>
+
         <Form.Submit asChild>
           <button className="Button">
             Register
