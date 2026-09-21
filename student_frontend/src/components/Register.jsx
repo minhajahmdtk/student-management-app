@@ -30,7 +30,7 @@ const Register = () => {
     e.preventDefault();
 
     axiosInstance
-      .post("/students/add", form)
+      .post("/api/students/add", form)
       .then((response) => {
         alert("Registration Successful");
         console.log("Registration Successful", response.data);

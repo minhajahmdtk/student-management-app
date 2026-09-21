@@ -25,7 +25,7 @@ const Login = () => {
     e.preventDefault();
 
     axiosInstance
-      .post("/students/login", form)
+      .post("/api/students/login", form)
       .then((response) => {
         if (response.data.token) {
           localStorage.setItem("loginToken", response.data.token);
